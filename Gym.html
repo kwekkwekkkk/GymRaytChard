@@ -1,0 +1,142 @@
+ <html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TITE KA RAIN</title>
+    <link rel="stylesheet" href="GYm.css">
+</head>
+<body>
+
+    <header>
+        <h1>GYM<span>BURAT</span></h1>
+
+        <nav>
+            <a href="#home">Home</a>
+            <a href="#programs">Programs</a>
+            <a href="#membership">Membership</a>
+            <a href="#contact">Contact</a>
+        </nav>
+    </header>
+
+    <section id="home" class="hero">
+        <div class="hero-content">
+            <h2>BUILD YOUR <span>STRENGTH</span></h2>
+            <p>Your fitness journey starts here.</p>
+            <button onclick="joinGym()">SIGN IN</button>
+        </div>
+    </section>
+
+    <div id="authPopup" class="popup">
+    <div class="popup-content">
+
+        <span class="close" onclick="closePopup()">&times;</span>
+
+        <h2 id="formTitle">SIGN UP</h2>
+        <p id="formDescription">Create your account.</p>
+
+        <form id="authForm">
+            <input
+                type="text"
+                id="fullName"
+                placeholder="Full Name"
+                required
+            >
+
+            <input
+                type="email"
+                id="email"
+                placeholder="Email Address"
+                required
+            >
+
+            <input
+                type="password"
+                id="password"
+                placeholder="Password, at least 8 characters"
+                minlength="8"
+                required
+            >
+
+            <button type="submit" id="submitBtn">
+                CREATE ACCOUNT
+            </button>
+        </form>
+
+        <p id="switchText">
+            Already have an account?
+            <a href="#" onclick="switchForm(event)">Log In</a>
+        </p>
+
+        <p id="message"></p>
+    </div>
+</div>
+
+
+    <section id="programs">
+        <h2>OUR PROGRAMS</h2>
+
+        <div class="container">
+            <div class="program">
+                <h3>Weight Training</h3>
+                <p>Build strength and improve your fitness.</p>
+            </div>
+
+            <div class="program">
+                <h3>Cardio Training</h3>
+                <p>Improve endurance and heart health.</p>
+            </div>
+
+            <div class="program">
+                <h3>Personal Training</h3>
+                <p>Get guidance from a fitness coach.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="membership">
+        <h2>MEMBERSHIP PLANS</h2>
+
+        <div class="container">
+            <div class="plan">
+                <h3>Basic</h3>
+                <h2>₱500</h2>
+                <p>Per Month</p>
+                <button onclick="selectPlan('Basic')">
+                    Choose Plan
+                </button>
+            </div>
+
+            <div class="plan featured">
+                <h3>Premium</h3>
+                <h2>₱1,000</h2>
+                <p>Per Month</p>
+                <button onclick="selectPlan('Premium')">
+                    Choose Plan
+                </button>
+            </div>
+
+            <div class="plan">
+                <h3>VIP</h3>
+                <h2>₱1,500</h2>
+                <p>Per Month</p>
+                <button onclick="selectPlan('VIP')">
+                    Choose Plan
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <section id="contact">
+        <h2>CONTACT US</h2>
+        <p>Email: kielmanabat0405@gmail.com</p>
+        <p>Location: Philippines</p>
+        <button onclick="contactGym()">Get Started</button>
+    </section>
+
+    <footer>
+        <p>&copy; 2026 GYM BURAT. All Rights Reserved.</p>
+    </footer>
+
+    <script src="gYM.js "></script>
+</body>
+</html>

@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GYMBURAT | Dashboard</title>
+    <link rel="stylesheet" href="dAshboard.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+</head>
+<body>
+
+    <aside class="sidebar">
+
+    <h2>GYM<span>BURAT</span></h2>
+
+    <nav>
+        <a href="#overview">Dashboard</a>
+        <a href="#profile">My Account</a>
+        <a href="#attendance">Gym Attendance</a>
+        <a href="WhatAbouMe.html">About Us</a>
+        <a href="Gym.html" onclick="logout(event)">Log Out</a>
+    </nav>
+
+   
+
+    <p class="sidebar-footer">GYMBURAT MEMBER AREA</p>
+
+</aside>
+
+    <main class="main-content">
+
+        <header class="topbar">
+            <div>
+                <p class="eyebrow">MEMBER PORTAL</p>
+                <h1>Dashboard</h1>
+            </div>
+            <div class="user-avatar" id="userAvatar">U</div>
+        </header>
+
+        <section id="overview" class="welcome">
+            <div>
+                <p class="eyebrow">WELCOME BACK</p>
+                <h2>Hello, <span id="welcomeName">Member</span>!</h2>
+                <p>Track your gym visits and monitor your attendance.</p>
+            </div>
+            <button class="visit-btn" onclick="recordVisit()">
+                + RECORD GYM VISIT
+            </button>
+        </section>
+
+        <section class="stats">
+            <div class="stat-card">
+                <p>Total Gym Visits</p>
+                <h2 id="totalVisits">0</h2>
+                <span>All recorded visits</span>
+            </div>
+
+            <div class="stat-card">
+                <p>This Week</p>
+                <h2 id="weeklyVisits">0</h2>
+                <span>Visits in the last 7 days</span>
+            </div>
+
+            <div class="stat-card">
+                <p>This Month</p>
+                <h2 id="monthlyVisits">0</h2>
+                <span>Visits this calendar month</span>
+            </div>
+        </section>
+
+       
+
+        <section id="profile" class="panel profile-panel">
+            <div class="panel-header">
+                <div>
+                    <h2>My Account</h2>
+                    <p>Your membership information.</p>
+                </div>
+                <span class="status">ACTIVE PROFILE</span>
+            </div>
+
+            <div class="profile-details">
+                <div>
+                    <span>Full Name</span>
+                    <strong id="profileName">Member</strong>
+                </div>
+
+                <div>
+                    <span>Email Address</span>
+                    <strong id="profileEmail">Not available</strong>
+                </div>
+
+                <div>
+                    <span>Membership Plan</span>
+                    <strong id="profilePlan">Basic</strong>
+                </div>
+
+                <div>
+                    <span>Member Since</span>
+                    <strong id="memberSince">Today</strong>
+                </div>
+            </div>
+        </section>
+
+        <section class="attendance-section">
+    <h2>GYM ATTENDANCE</h2>
+    <p class="attendance-subtitle">Track your gym visits</p>
+
+    <div class="attendance-summary">
+        <div>
+            <span id="attendanceTotal">0 visits</span>
+            <small>Total gym visits</small>
+        </div>
+        <div>
+            <span id="attendancePeriodTotal">0</span>
+            <small id="attendancePeriodLabel">Visits this month</small>
+        </div>
+    </div>
+
+    <div class="attendance-card">
+        <div class="attendance-tabs">
+            <button class="attendance-tab active"
+                    onclick="changeAttendanceView('day', this)">Day</button>
+            <button class="attendance-tab"
+                    onclick="changeAttendanceView('week', this)">Week</button>
+            <button class="attendance-tab"
+                    onclick="changeAttendanceView('month', this)">Month</button>
+        </div>
+
+        <div class="attendance-chart">
+            <canvas id="attendanceChart"></canvas>
+        </div>
+
+        <div class="attendance-details">
+            <div>
+                <small>Gym visits</small>
+                <strong id="chartVisitCount">0</strong>
+            </div>
+            <div>
+                <small>Selected view</small>
+                <strong id="chartViewName">Day</strong>
+            </div>
+        </div>
+    </div>
+</section>
+
+        <footer>
+            &copy; 2026 GYMBURAT. All Rights Reserved.
+        </footer>
+
+    </main>
+
+    <script src="daShboard.js"></script>
+</body>
+</html>
