@@ -1,4 +1,6 @@
- <html lang="en">
+
+<!DOCTYPE html>
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -18,60 +20,16 @@
         </nav>
     </header>
 
+    <!-- HOME -->
     <section id="home" class="hero">
         <div class="hero-content">
             <h2>BUILD YOUR <span>STRENGTH</span></h2>
             <p>Your fitness journey starts here.</p>
-            <button onclick="joinGym()">SIGN IN</button>
+            <button type="button" onclick="joinGym()">SIGN IN</button>
         </div>
     </section>
 
-    <div id="authPopup" class="popup">
-    <div class="popup-content">
-
-        <span class="close" onclick="closePopup()">&times;</span>
-
-        <h2 id="formTitle">SIGN UP</h2>
-        <p id="formDescription">Create your account.</p>
-
-        <form id="authForm">
-            <input
-                type="text"
-                id="fullName"
-                placeholder="Full Name"
-                required
-            >
-
-            <input
-                type="email"
-                id="email"
-                placeholder="Email Address"
-                required
-            >
-
-            <input
-                type="password"
-                id="password"
-                placeholder="Password, at least 8 characters"
-                minlength="8"
-                required
-            >
-
-            <button type="submit" id="submitBtn">
-                CREATE ACCOUNT
-            </button>
-        </form>
-
-        <p id="switchText">
-            Already have an account?
-            <a href="#" onclick="switchForm(event)">Log In</a>
-        </p>
-
-        <p id="message"></p>
-    </div>
-</div>
-
-
+    <!-- PROGRAMS -->
     <section id="programs">
         <h2>OUR PROGRAMS</h2>
 
@@ -93,50 +51,193 @@
         </div>
     </section>
 
-    <section id="membership">
-        <h2>MEMBERSHIP PLANS</h2>
+    <!-- MEMBERSHIP PLANS -->
+    <section class="membership-section" id="membership">
+        <p class="section-label">CHOOSE YOUR PLAN</p>
+        <h2>Membership <span>Plans</span></h2>
+        <p class="section-description">
+            Choose the membership that fits your fitness goals.
+        </p>
 
-        <div class="container">
-            <div class="plan">
+        <div class="membership-container">
+
+            <div class="membership-card">
                 <h3>Basic</h3>
-                <h2>₱500</h2>
-                <p>Per Month</p>
-                <button onclick="selectPlan('Basic')">
-                    Choose Plan
+                <h2>₱499 <small>/ month</small></h2>
+                <p>Perfect for starting your fitness journey.</p>
+
+                <ul>
+                    <li>Gym equipment access</li>
+                    <li>Basic workout area</li>
+                    <li>Track your gym visits</li>
+                </ul>
+
+                <button type="button" onclick="selectPlan('Basic')">
+                    Choose Basic
                 </button>
             </div>
 
-            <div class="plan featured">
+            <div class="membership-card popular">
+                <span class="popular-label">POPULAR</span>
+                <h3>Standard</h3>
+                <h2>₱799 <small>/ month</small></h2>
+                <p>For members who want more flexibility.</p>
+
+                <ul>
+                    <li>All Basic benefits</li>
+                    <li>Group workout sessions</li>
+                    <li>Track your gym visits</li>
+                </ul>
+
+                <button type="button" onclick="selectPlan('Standard')">
+                    Choose Standard
+                </button>
+            </div>
+
+            <div class="membership-card">
                 <h3>Premium</h3>
-                <h2>₱1,000</h2>
-                <p>Per Month</p>
-                <button onclick="selectPlan('Premium')">
-                    Choose Plan
+                <h2>₱1,199 <small>/ month</small></h2>
+                <p>For members looking for extra benefits.</p>
+
+                <ul>
+                    <li>All Standard benefits</li>
+                    <li>Additional fitness benefits</li>
+                    <li>Priority member support</li>
+                </ul>
+
+                <button type="button" onclick="selectPlan('Premium')">
+                    Choose Premium
                 </button>
             </div>
 
-            <div class="plan">
-                <h3>VIP</h3>
-                <h2>₱1,500</h2>
-                <p>Per Month</p>
-                <button onclick="selectPlan('VIP')">
-                    Choose Plan
-                </button>
-            </div>
         </div>
     </section>
 
+    <!-- SIGN IN / SIGN UP POPUP -->
+    <div id="authPopup" class="popup">
+        <div class="popup-content">
+
+            <button type="button" class="close"
+                    aria-label="Close popup"
+                    onclick="closePopup()">&times;</button>
+
+            <h2 id="formTitle">SIGN UP</h2>
+            <p id="formDescription">
+                Choose a membership plan to get started.
+            </p>
+
+            <!-- MEMBERSHIP SELECTOR -->
+            <div id="membershipSelector" class="membership-selector">
+
+                <p class="membership-heading">
+                    CHOOSE YOUR MEMBERSHIP
+                </p>
+
+                <button type="button" class="popup-plan"
+                        data-plan="Basic"
+                        onclick="selectPlan('Basic')">
+                    <span>
+                        <strong>Basic</strong>
+                        <small>Gym equipment access</small>
+                    </span>
+                    <b>₱499/mo</b>
+                </button>
+
+                <button type="button" class="popup-plan"
+                        data-plan="Standard"
+                        onclick="selectPlan('Standard')">
+                    <span>
+                        <strong>Standard
+                            <small class="popular-tag">POPULAR</small>
+                        </strong>
+                        <small>Group workout sessions</small>
+                    </span>
+                    <b>₱799/mo</b>
+                </button>
+
+                <button type="button" class="popup-plan"
+                        data-plan="Premium"
+                        onclick="selectPlan('Premium')">
+                    <span>
+                        <strong>Premium</strong>
+                        <small>Extra fitness benefits</small>
+                    </span>
+                    <b>₱1,199/mo</b>
+                </button>
+
+            </div>
+
+            <p id="selectedPlanText" class="selected-plan">
+                Please select a membership above.
+            </p>
+
+            <!-- PAYMENT METHOD -->
+            <div id="paymentGroup" class="payment-group">
+                <label for="paymentMethod">Choose Payment Method</label>
+
+                <select id="paymentMethod">
+                    <option value="">-- Select Payment Method --</option>
+                    <option value="GCash">GCash</option>
+                    <option value="Maya">Maya</option>
+                    <option value="Cash at Gym">Cash at Gym</option>
+                    <option value="Card Demo">Card (Demo Only)</option>
+                </select>
+            </div>
+
+            <!-- ACCOUNT FORM -->
+            <form id="authForm">
+                <input
+                    type="text"
+                    id="fullName"
+                    placeholder="Full Name"
+                    autocomplete="name"
+                    required
+                >
+
+                <input
+                    type="email"
+                    id="email"
+                    placeholder="Email Address"
+                    autocomplete="email"
+                    required
+                >
+
+                <input
+                    type="password"
+                    id="password"
+                    placeholder="Password, at least 8 characters"
+                    minlength="8"
+                    autocomplete="new-password"
+                    required
+                >
+
+                <button type="submit" id="submitBtn">
+                    CREATE ACCOUNT
+                </button>
+            </form>
+
+            <p id="switchText">
+                Already have an account?
+                <a href="#" onclick="switchForm(event)">Log In</a>
+            </p>
+
+            <p id="message" role="status" aria-live="polite"></p>
+
+        </div>
+    </div>
+
+    <!-- CONTACT -->
     <section id="contact">
         <h2>CONTACT US</h2>
         <p>Email: kielmanabat0405@gmail.com</p>
         <p>Location: Philippines</p>
-        <button onclick="contactGym()">Get Started</button>
+        <button type="button" onclick="contactGym()">Get Started</button>
     </section>
 
     <footer>
         <p>&copy; 2026 GYM BURAT. All Rights Reserved.</p>
     </footer>
 
-    <script src="gYM.js "></script>
+    <script src="gYM.js"></script>
 </body>
 </html>
