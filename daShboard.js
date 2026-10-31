@@ -1,62 +1,46 @@
 
+// GET CURRENT USER
 const userEmail = sessionStorage.getItem("gymUserEmail");
 const accounts = JSON.parse(localStorage.getItem("gymAccounts") || "[]");
-
-const currentUser = accounts.find(account => account.email === userEmail);
+const currentUser = accounts.find(user => user.email === userEmail);
 
 let attendanceChart = null;
 let attendanceView = "day";
 
-// Check whether a member is logged in
+// CHECK LOGIN
 if (!currentUser) {
     window.location.replace("Gym.html");
 } else {
     loadDashboard();
 }
 
-// Get the current member's gym visits
+// GET GYM VISITS
 function getVisits() {
-    if (!currentUser) return [];
-
-    const allVisits = JSON.parse(
-        localStorage.getItem("gymVisits") || "{}"
-    );
-
-    return allVisits[currentUser.email] || [];
+    const visits = JSON.parse(localStorage.getItem("gymVisits") || "{}");
+    return currentUser ? visits[currentUser.email] || [] : [];
 }
 
-// Save gym visits
+// SAVE GYM VISITS
 function saveVisits(visits) {
-    const allVisits = JSON.parse(
-        localStorage.getItem("gymVisits") || "{}"
-    );
+    const allVisits = JSON.parse(localStorage.getItem("gymVisits") || "{}");
 
     allVisits[currentUser.email] = visits;
 
     localStorage.setItem("gymVisits", JSON.stringify(allVisits));
 }
 
-// Compare dates by calendar day
-function sameDay(dateA, dateB) {
-    return dateA.toDateString() === dateB.toDateString();
+// CHECK IF DATES ARE THE SAME
+function sameDay(date1, date2) {
+    return date1.toDateString() === date2.toDateString();
 }
 
-// Load member information
+// LOAD DASHBOARD INFORMATION
 function loadDashboard() {
-    document.getElementById("welcomeName").textContent =
-        currentUser.name;
-
-    document.getElementById("userAvatar").textContent =
-        currentUser.name.charAt(0).toUpperCase();
-
-    document.getElementById("profileName").textContent =
-        currentUser.name;
-
-    document.getElementById("profileEmail").textContent =
-        currentUser.email;
-
-    document.getElementById("profilePlan").textContent =
-        currentUser.plan || "Basic";
+    document.getElementById("welcomeName").textContent = currentUser.name;
+    document.getElementById("userAvatar").textContent = currentUser.name.charAt(0).toUpperCase();
+    document.getElementById("profileName").textContent = currentUser.name;
+    document.getElementById("profileEmail").textContent = currentUser.email;
+    document.getElementById("profilePlan").textContent = currentUser.plan || "Basic";
 
     document.getElementById("memberSince").textContent =
         currentUser.memberSince
@@ -67,43 +51,37 @@ function loadDashboard() {
     updateAttendanceChart();
 }
 
-// Update total, weekly, and monthly visits
+// UPDATE VISIT STATISTICS
 function updateStats() {
-    const visits = getVisits().map(date => new Date(date));
-    const now = new Date();
+    const visits = getVisits()
+        .map(date => new Date(date))
+        .filter(date => !isNaN(date.getTime()));
 
-    const weekStart = new Date(now);
-    weekStart.setDate(now.getDate() - 6);
-    weekStart.setHours(0, 0, 0, 0);
+    const today = new Date();
 
-    const weekly = visits.filter(date =>
-        !isNaN(date.getTime()) &&
-        date >= weekStart &&
-        date <= now
-    );
+    const weekly = visits.filter(date => {
+        const start = new Date(today);
+        start.setDate(today.getDate() - 6);
+        start.setHours(0, 0, 0, 0);
+
+        return date >= start && date <= today;
+    });
 
     const monthly = visits.filter(date =>
-        !isNaN(date.getTime()) &&
-        date.getMonth() === now.getMonth() &&
-        date.getFullYear() === now.getFullYear()
+        date.getMonth() === today.getMonth() &&
+        date.getFullYear() === today.getFullYear()
     );
 
-    document.getElementById("totalVisits").textContent =
-        visits.filter(date => !isNaN(date.getTime())).length;
-
-    document.getElementById("weeklyVisits").textContent =
-        weekly.length;
-
-    document.getElementById("monthlyVisits").textContent =
-        monthly.length;
+    document.getElementById("totalVisits").textContent = visits.length;
+    document.getElementById("weeklyVisits").textContent = weekly.length;
+    document.getElementById("monthlyVisits").textContent = monthly.length;
 }
 
-// Record a gym visit
+// RECORD GYM VISIT
 function recordVisit() {
     if (!currentUser) return;
 
     const visits = getVisits();
-
     visits.push(new Date().toISOString());
 
     saveVisits(visits);
@@ -113,16 +91,7 @@ function recordVisit() {
     alert("Gym visit recorded successfully!");
 }
 
-// Format a date for comparison
-function getDateKey(date) {
-    return [
-        date.getFullYear(),
-        String(date.getMonth() + 1).padStart(2, "0"),
-        String(date.getDate()).padStart(2, "0")
-    ].join("-");
-}
-
-// Change the chart between Day, Week, and Month
+// CHANGE CHART VIEW
 function changeAttendanceView(view, button) {
     attendanceView = view;
 
@@ -135,7 +104,7 @@ function changeAttendanceView(view, button) {
     updateAttendanceChart();
 }
 
-// Draw the attendance chart
+// UPDATE ATTENDANCE CHART
 function updateAttendanceChart() {
     const canvas = document.getElementById("attendanceChart");
 
@@ -149,113 +118,84 @@ function updateAttendanceChart() {
     const labels = [];
     const counts = [];
 
+    let totalPeriods = 18;
+
     if (attendanceView === "day") {
-        // Show the last 18 days
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - 17);
+        // LAST 18 DAYS
+        for (let i = 17; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
 
-        for (let i = 0; i < 18; i++) {
-            const date = new Date(startDate);
-            date.setDate(startDate.getDate() + i);
+            labels.push(sameDay(date, today) ? "Today" : date.getDate());
 
-            labels.push(
-                sameDay(date, today)
-                    ? "Today"
-                    : String(date.getDate())
-            );
-
-            counts.push(
-                visits.filter(visit => sameDay(visit, date)).length
-            );
+            counts.push(visits.filter(visit => sameDay(visit, date)).length);
         }
 
         document.getElementById("attendancePeriodLabel").textContent =
             "Visits in the last 18 days";
 
     } else if (attendanceView === "week") {
-        // Show the last 7 days
-        const startDate = new Date(today);
-        startDate.setDate(today.getDate() - 6);
+        // LAST 7 DAYS
+        totalPeriods = 7;
 
-        for (let i = 0; i < 7; i++) {
-            const date = new Date(startDate);
-            date.setDate(startDate.getDate() + i);
+        for (let i = 6; i >= 0; i--) {
+            const date = new Date(today);
+            date.setDate(today.getDate() - i);
 
-            labels.push(
-                date.toLocaleDateString("en-US", {
-                    weekday: "short"
-                })
-            );
+            labels.push(date.toLocaleDateString("en-US", {
+                weekday: "short"
+            }));
 
-            counts.push(
-                visits.filter(visit => sameDay(visit, date)).length
-            );
+            counts.push(visits.filter(visit => sameDay(visit, date)).length);
         }
 
         document.getElementById("attendancePeriodLabel").textContent =
             "Visits this week";
 
     } else {
-        // Show the last 12 months
-        const firstMonth = new Date(
-            today.getFullYear(),
-            today.getMonth() - 11,
-            1
-        );
+        // LAST 12 MONTHS
+        totalPeriods = 12;
 
-        for (let i = 0; i < 12; i++) {
-            const date = new Date(
-                firstMonth.getFullYear(),
-                firstMonth.getMonth() + i,
-                1
-            );
+        for (let i = 11; i >= 0; i--) {
+            const date = new Date(today.getFullYear(), today.getMonth() - i, 1);
 
-            labels.push(
-                date.toLocaleDateString("en-US", {
-                    month: "short"
-                })
-            );
+            labels.push(date.toLocaleDateString("en-US", {
+                month: "short"
+            }));
 
-            counts.push(
-                visits.filter(visit =>
-                    visit.getMonth() === date.getMonth() &&
-                    visit.getFullYear() === date.getFullYear()
-                ).length
-            );
+            counts.push(visits.filter(visit =>
+                visit.getMonth() === date.getMonth() &&
+                visit.getFullYear() === date.getFullYear()
+            ).length);
         }
 
         document.getElementById("attendancePeriodLabel").textContent =
             "Visits in the last 12 months";
     }
 
-    const periodTotal = counts.reduce(
-        (total, count) => total + count, 0
-    );
+    // UPDATE TOTALS
+    const periodTotal = counts.reduce((sum, count) => sum + count, 0);
 
     document.getElementById("attendanceTotal").textContent =
-        `${visits.length} visits`;
+        visits.length + " visits";
 
-    document.getElementById("attendancePeriodTotal").textContent =
-        periodTotal;
-
-    document.getElementById("chartVisitCount").textContent =
-        periodTotal;
+    document.getElementById("attendancePeriodTotal").textContent = periodTotal;
+    document.getElementById("chartVisitCount").textContent = periodTotal;
 
     document.getElementById("chartViewName").textContent =
-        attendanceView.charAt(0).toUpperCase() +
-        attendanceView.slice(1);
+        attendanceView.charAt(0).toUpperCase() + attendanceView.slice(1);
 
-    // Destroy the previous chart before drawing a new one
+    // REMOVE OLD CHART
     if (attendanceChart) {
         attendanceChart.destroy();
     }
 
+    // CREATE NEW CHART
     attendanceChart = new Chart(canvas, {
         type: "bar",
 
         data: {
             labels: labels,
-
             datasets: [{
                 label: "Gym Visits",
                 data: counts,
@@ -283,63 +223,45 @@ function updateAttendanceChart() {
                     bodyColor: "#48d875",
 
                     callbacks: {
-                        label: function(context) {
-                            return context.raw + " gym visit(s)";
-                        }
+                        label: context => context.raw + " gym visit(s)"
                     }
                 }
             },
 
             scales: {
                 x: {
-                    grid: {
-                        display: false
-                    },
-
+                    grid: { display: false },
                     ticks: {
                         color: "#888",
                         maxRotation: 0,
                         autoSkip: true,
                         maxTicksLimit: 10
                     },
-
-                    border: {
-                        display: false
-                    }
+                    border: { display: false }
                 },
 
                 y: {
                     beginAtZero: true,
-
                     ticks: {
                         color: "#888",
                         precision: 0,
                         stepSize: 1
                     },
-
                     grid: {
                         color: "#383838",
-                        border: {
-                            dash: [3, 4]
-                        }
+                        border: { dash: [3, 4] }
                     },
-
-                    border: {
-                        display: false
-                    }
+                    border: { display: false }
                 }
             }
         }
     });
 }
 
-// Log out and return to the first page
+// LOG OUT
 function logout(event) {
-    if (event) {
-        event.preventDefault();
-    }
+    if (event) event.preventDefault();
 
     sessionStorage.removeItem("gymUserEmail");
-
     window.location.replace("Gym.html");
 }

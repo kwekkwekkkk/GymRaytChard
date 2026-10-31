@@ -2,14 +2,14 @@
 let isSignUp = true;
 let selectedPlan = "";
 
-// Open the popup when SIGN IN is clicked
+// OPEN SIGN UP POPUP
 function joinGym() {
     isSignUp = true;
     document.getElementById("authPopup").style.display = "flex";
     showForm();
 }
 
-// Close the popup
+// CLOSE POPUP
 function closePopup() {
     document.getElementById("authPopup").style.display = "none";
     document.getElementById("authForm").reset();
@@ -17,22 +17,18 @@ function closePopup() {
     selectedPlan = "";
     document.getElementById("message").textContent = "";
 
-    document.querySelectorAll(".popup-plan").forEach(button => {
-        button.classList.remove("selected");
-    });
-
     isSignUp = true;
     showForm();
 }
 
-// Switch between Sign Up and Log In
+// SWITCH BETWEEN SIGN UP AND LOG IN
 function switchForm(event) {
     event.preventDefault();
     isSignUp = !isSignUp;
     showForm();
 }
 
-// Display the appropriate form
+// DISPLAY FORM
 function showForm() {
     const title = document.getElementById("formTitle");
     const description = document.getElementById("formDescription");
@@ -44,58 +40,33 @@ function showForm() {
     const planText = document.getElementById("selectedPlanText");
     const paymentGroup = document.getElementById("paymentGroup");
     const paymentMethod = document.getElementById("paymentMethod");
-    const membershipSelector =
-        document.getElementById("membershipSelector");
+    const membershipSelector = document.getElementById("membershipSelector");
 
     title.textContent = isSignUp ? "SIGN UP" : "LOG IN";
+    description.textContent = isSignUp
+        ? (selectedPlan ? "Complete your details to join GYMBUDOL." : "Choose a membership plan to get started.")
+        : "Welcome back to GYMBUDOL!";
 
-    if (isSignUp) {
-        description.textContent = selectedPlan
-            ? "Complete your details to join GYMBURAT."
-            : "Choose a membership plan to get started.";
+    membershipSelector.style.display = isSignUp ? "flex" : "none";
+    planText.style.display = isSignUp ? "block" : "none";
+    paymentGroup.style.display = isSignUp ? "flex" : "none";
+    fullName.style.display = isSignUp ? "block" : "none";
 
-        membershipSelector.style.display = "flex";
-        planText.style.display = "block";
+    planText.textContent = selectedPlan
+        ? "Selected Membership: " + selectedPlan
+        : "Please select a membership above.";
 
-        planText.textContent = selectedPlan
-            ? "Selected Membership: " + selectedPlan
-            : "Please select a membership above.";
+    fullName.required = isSignUp;
+    paymentMethod.required = isSignUp;
 
-        paymentGroup.style.display = "flex";
-        paymentMethod.required = true;
+    password.autocomplete = isSignUp ? "new-password" : "current-password";
 
-        fullName.style.display = "block";
-        fullName.required = true;
-        fullName.autocomplete = "name";
+    submitBtn.textContent = isSignUp ? "CREATE ACCOUNT" : "LOG IN";
 
-        password.autocomplete = "new-password";
-        submitBtn.textContent = "CREATE ACCOUNT";
+    switchText.innerHTML = isSignUp
+        ? 'Already have an account? <a href="#" onclick="switchForm(event)">Log In</a>'
+        : 'Don\'t have an account? <a href="#" onclick="switchForm(event)">Sign Up</a>';
 
-        switchText.innerHTML =
-            'Already have an account? ' +
-            '<a href="#" onclick="switchForm(event)">Log In</a>';
-
-    } else {
-        description.textContent = "Welcome back to GYMBURAT!";
-
-        membershipSelector.style.display = "none";
-        planText.style.display = "none";
-
-        paymentGroup.style.display = "none";
-        paymentMethod.required = false;
-
-        fullName.style.display = "none";
-        fullName.required = false;
-
-        password.autocomplete = "current-password";
-        submitBtn.textContent = "LOG IN";
-
-        switchText.innerHTML =
-            'Don\'t have an account? ' +
-            '<a href="#" onclick="switchForm(event)">Sign Up</a>';
-    }
-
-    // Highlight the selected membership plan
     document.querySelectorAll(".popup-plan").forEach(button => {
         button.classList.toggle(
             "selected",
@@ -106,170 +77,113 @@ function showForm() {
     message.textContent = "";
 }
 
-// Select a membership plan
+// SELECT MEMBERSHIP PLAN
 function selectPlan(planName) {
-    const allowedPlans = ["Basic", "Standard", "Premium"];
+    const plans = ["Basic", "Standard", "Premium"];
 
-    if (!allowedPlans.includes(planName)) {
-        return;
-    }
+    if (!plans.includes(planName)) return;
 
     selectedPlan = planName;
     isSignUp = true;
 
     document.getElementById("authPopup").style.display = "flex";
-
     showForm();
 }
 
-// Register an account or log in
-document.getElementById("authForm").addEventListener(
-    "submit",
-    function(event) {
-        event.preventDefault();
+// GET SAVED ACCOUNTS
+function getAccounts() {
+    try {
+        return JSON.parse(localStorage.getItem("gymAccounts")) || [];
+    } catch {
+        return [];
+    }
+}
 
-        const name = document.getElementById("fullName").value.trim();
-        const email = document.getElementById("email").value
-            .trim()
-            .toLowerCase();
-        const password = document.getElementById("password").value;
-        const paymentMethod =
-            document.getElementById("paymentMethod").value;
-        const message = document.getElementById("message");
+// REGISTER OR LOG IN
+document.getElementById("authForm").addEventListener("submit", function(event) {
+    event.preventDefault();
 
-        let accounts = [];
+    const name = document.getElementById("fullName").value.trim();
+    const email = document.getElementById("email").value.trim().toLowerCase();
+    const password = document.getElementById("password").value;
+    const paymentMethod = document.getElementById("paymentMethod").value;
+    const message = document.getElementById("message");
+
+    let accounts = getAccounts();
+
+    // SIGN UP
+    if (isSignUp) {
+
+        if (!selectedPlan) {
+            message.textContent = "Please select a membership plan above.";
+            return;
+        }
+
+        if (!paymentMethod) {
+            message.textContent = "Please select a payment method.";
+            return;
+        }
+
+        if (accounts.some(account => account.email === email)) {
+            message.textContent = "This email already has an account. Please log in.";
+            return;
+        }
+
+        const account = {
+            name,
+            email,
+            password,
+            plan: selectedPlan,
+            paymentMethod,
+
+            paymentStatus:
+                paymentMethod === "Cash at Gym" ? "Pay at Gym" :
+                paymentMethod === "Card Demo" ? "Demo Only" :
+                "Not Verified",
+
+            memberSince: new Date().toISOString()
+        };
+
+        accounts.push(account);
 
         try {
-            accounts = JSON.parse(
-                localStorage.getItem("gymAccounts") || "[]"
-            );
-
-            if (!Array.isArray(accounts)) {
-                accounts = [];
-            }
-        } catch (error) {
-            accounts = [];
+            localStorage.setItem("gymAccounts", JSON.stringify(accounts));
+            sessionStorage.setItem("gymUserEmail", email);
+            window.location.href = "dashboard.html";
+        } catch {
+            message.textContent = "Unable to save your account. Please check your browser storage.";
         }
 
-        // SIGN UP
-        if (isSignUp) {
+    } else {
 
-            // Check membership
-            if (!selectedPlan) {
-                message.style.color = "#ff4500";
-                message.textContent =
-                    "Please select a membership plan above.";
-                return;
-            }
+        // LOG IN
+        const account = accounts.find(
+            account => account.email === email && account.password === password
+        );
 
-            // Check payment method
-            if (!paymentMethod) {
-                message.style.color = "#ff4500";
-                message.textContent =
-                    "Please select a payment method.";
-                return;
-            }
-
-            // Prevent duplicate accounts
-            const existingAccount = accounts.some(
-                account => account.email === email
-            );
-
-            if (existingAccount) {
-                message.style.color = "#ff4500";
-                message.textContent =
-                    "This email already has an account. Please log in.";
-                return;
-            }
-
-            // Create account
-            const account = {
-                name: name,
-                email: email,
-                password: password,
-                plan: selectedPlan,
-                paymentMethod: paymentMethod,
-
-                paymentStatus:
-                    paymentMethod === "Cash at Gym"
-                        ? "Pay at Gym"
-                        : paymentMethod === "Card Demo"
-                            ? "Demo Only"
-                            : "Not Verified",
-
-                memberSince: new Date().toISOString()
-            };
-
-            accounts.push(account);
-
-            try {
-                localStorage.setItem(
-                    "gymAccounts",
-                    JSON.stringify(accounts)
-                );
-
-                sessionStorage.setItem("gymUserEmail", email);
-
-                // Go to dashboard
-                window.location.href = "dashboard.html";
-
-            } catch (error) {
-                message.style.color = "#ff4500";
-                message.textContent =
-                    "Unable to save your account. Please check your browser storage.";
-            }
-
-        } else {
-
-            // LOG IN
-            const account = accounts.find(
-                account =>
-                    account.email === email &&
-                    account.password === password
-            );
-
-            if (!account) {
-                message.style.color = "#ff4500";
-                message.textContent =
-                    "Incorrect email or password.";
-                return;
-            }
-
-            try {
-                sessionStorage.setItem("gymUserEmail", email);
-
-                // Go to dashboard
-                window.location.href = "dashboard.html";
-
-            } catch (error) {
-                message.style.color = "#ff4500";
-                message.textContent =
-                    "Unable to start your session. Please try again.";
-            }
+        if (!account) {
+            message.textContent = "Incorrect email or password.";
+            return;
         }
+
+        sessionStorage.setItem("gymUserEmail", email);
+        window.location.href = "dashboard.html";
     }
-);
+});
 
-// Contact button
+// CONTACT BUTTON
 function contactGym() {
     document.getElementById("contact").scrollIntoView({
         behavior: "smooth"
     });
 }
 
-// Close popup when clicking outside it
-document.getElementById("authPopup").addEventListener(
-    "click",
-    function(event) {
-        if (event.target === this) {
-            closePopup();
-        }
-    }
-);
+// CLOSE POPUP WHEN CLICKING OUTSIDE
+document.getElementById("authPopup").addEventListener("click", function(event) {
+    if (event.target === this) closePopup();
+});
 
-// Close popup using the Escape key
+// CLOSE POPUP USING ESCAPE KEY
 document.addEventListener("keydown", function(event) {
-    if (event.key === "Escape") {
-        closePopup();
-    }
+    if (event.key === "Escape") closePopup();
 });
